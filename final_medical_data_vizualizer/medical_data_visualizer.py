@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Import data
-df = pd.read_csv('medical_examination.csv')
+df = pd.read_csv('C:/Users/pixel/Python_codding/Freecodecamp_data_science/final_medical_data_vizualizer/medical_examination.csv')
 
 # Add 'overweight' column
 df['overweight'] = df[['weight', 'height']].apply(lambda x: 1 if (x[0] / (x[1]/100)**2) > 25 else 0, axis=1)
@@ -41,21 +41,26 @@ def draw_cat_plot():
 # Draw Heat Map
 def draw_heat_map():
     # Clean the data
-    df_heat = None
+    df_heat = df.loc[(df['ap_hi'] >= df['ap_lo']) 
+                 & (df['height'] >= df['height'].quantile(0.025))
+                 & (df['height'] <= df['height'].quantile(0.975))
+                 & (df['weight'] >= df['weight'].quantile(0.025))
+                 & (df['weight'] <= df['weight'].quantile(0.975))
+                ]
 
     # Calculate the correlation matrix
-    corr = None
+    corr = df_heat.corr()
 
     # Generate a mask for the upper triangle
-    mask = None
+    mask = np.triu(np.ones_like(corr, dtype='bool'))
 
 
 
     # Set up the matplotlib figure
-    fig, ax = None
+    fig, ax = plt.subplots(figsize=(11, 9))
 
     # Draw the heatmap with 'sns.heatmap()'
-
+    sns.heatmap(corr, annot=True, fmt='.1f', linewidth=0.7, mask=mask, cbar_kws={"shrink":.5}, center=0.08, square=True, robust=True, ax=ax)
 
 
     # Do not modify the next two lines
