@@ -2,11 +2,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from pandas.plotting import register_matplotlib_converters
+import os
 
 register_matplotlib_converters()
 
 # Import data (Make sure to parse dates. Consider setting index column to 'date'.)
-df = pd.read_csv("fcc-forum-pageviews.csv", parse_dates=["date"], index_col="date")
+df = pd.read_csv("C:/Users/pixel/Python_codding/Freecodecamp_data_science/Final_projects/final_time_series_visualizer/fcc-forum-pageviews.csv", parse_dates=["date"], index_col="date")
 
 # Clean data
 df = df.loc[
@@ -32,9 +33,22 @@ def draw_line_plot():
 
 def draw_bar_plot():
     # Copy and modify data for monthly bar plot
-    df_bar = None
+    months = ["January", "February", "March", "April", "May", "June", 
+              "July", "August", "September", "October", "November", "December"]
+    df_bar = df.reset_index()
+    df_bar['year'] = df_bar['date'].dt.year
+    df_bar['month'] = df_bar['date'].dt.month_name()
+    df_bar['month'] = pd.Categorical(df_bar['month'], categories=months, ordered=True)
+    df_bar.drop('date', axis=1, inplace=True)
+    df_bar = df_bar.groupby(['year', 'month']).mean().unstack(level=-1)
 
     # Draw bar plot
+    fig = df_bar.plot(kind='bar', figsize=(10, 8)).figure
+    plt.legend(months, fontsize=14)
+    plt.xlabel('Years', fontsize=13)
+    plt.ylabel('Average Page Views', fontsize=13)
+    plt.tick_params(labelsize=12)
+
 
     # Save image and return fig (don't change this part)
     fig.savefig("bar_plot.png")
