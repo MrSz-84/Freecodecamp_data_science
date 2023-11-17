@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from pandas.plotting import register_matplotlib_converters
-import os
 
 register_matplotlib_converters()
+
 
 # Import data (Make sure to parse dates. Consider setting index column to 'date'.)
 df = pd.read_csv("C:/Users/pixel/Python_codding/Freecodecamp_data_science/Final_projects/final_time_series_visualizer/fcc-forum-pageviews.csv", parse_dates=["date"], index_col="date")
@@ -35,7 +35,7 @@ def draw_bar_plot():
     # Copy and modify data for monthly bar plot
     months = ["January", "February", "March", "April", "May", "June", 
               "July", "August", "September", "October", "November", "December"]
-    df_bar = df.reset_index()
+    df_bar = df.reset_index().copy()
     df_bar['year'] = df_bar['date'].dt.year
     df_bar['month'] = df_bar['date'].dt.month_name()
     df_bar['month'] = pd.Categorical(df_bar['month'], categories=months, ordered=True)
@@ -63,7 +63,20 @@ def draw_box_plot():
     df_box["month"] = [d.strftime("%b") for d in df_box.date]
 
     # Draw box plots (using Seaborn)
+    fig, axes = plt.subplots(1, 2, figsize=(18, 6), tight_layout=True)
+    plt.tight_layout(pad=5)
 
+    sns.boxplot(ax=axes[0], data=df_box, x='year', y='value')
+    axes[0].set_title('Year-wise Box Plot (Trend)')
+    axes[0].set_ylabel('Page Views')
+    axes[0].set_xlabel('Year')
+
+    order = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', ]
+    sns.boxplot(ax=axes[1], data=df_box, x='month', y='value', order=order)
+    axes[1].set_title('Month-wise Box Plot (Seasonality)')
+    axes[1].set_ylabel('Page Views')
+    axes[1].set_xlabel('Month')
+    
     # Save image and return fig (don't change this part)
     fig.savefig("box_plot.png")
     return fig
